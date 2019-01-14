@@ -10,17 +10,22 @@ class PokemonPage extends React.Component {
     super()
     this.state = {
       pokemon: [],
+      query: ''
     }
   }
 
   handleSearch = e => {
-    let searchTerm = e.target.value
+
+    this.setState({
+      query: e.target.value
+    })
+
     let filteredPokemon = [...this.state.pokemon]
     let result = filteredPokemon.filter(pokemon =>
       pokemon.name.includes(e.target.value)
     )
     this.setState({ pokemon: result })
-    if (e.target.value.length === 0) {
+    if (this.state.query.length > e.target.value.length) {
       this.fetchPokemon()
     }
   }
@@ -39,6 +44,20 @@ class PokemonPage extends React.Component {
       )
   }
 
+  addNewPokemon = (newPokemonObject) => {
+    let result = this.setState({
+        pokemon: [...this.state.pokemon, newPokemonObject]
+    })
+
+    fetch(URL, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(
+        result
+      )
+    })
+  }
+
   render() {
     console.log('this is the state of pokemon', this.state.pokemon)
     return (
@@ -49,7 +68,7 @@ class PokemonPage extends React.Component {
         <br />
         <PokemonCollection pokemon={this.state.pokemon} />
         <br />
-        <PokemonForm />
+        <PokemonForm addNewPokemon={this.addNewPokemon}/>
       </div>
     )
   }
